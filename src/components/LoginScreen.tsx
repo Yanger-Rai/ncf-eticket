@@ -1,26 +1,6 @@
-"use client";
-import React, { useState, FormEvent } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { login } from "@/app/login/actions";
 
-export default function LoginScreen() {
-  const supabase = createClient();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-    if (error) setError(error.message);
-    setLoading(false);
-  };
-
+export default async function LoginScreen({ message }: { message?: string }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-sm">
@@ -29,7 +9,7 @@ export default function LoginScreen() {
           <p className="text-gray-600">Ticket Management Portal</p>
         </div>
         <div className="bg-white p-8 rounded-2xl shadow-xl">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form className="space-y-6" action={login}>
             <div>
               <label
                 htmlFor="email"
@@ -40,10 +20,10 @@ export default function LoginScreen() {
               <input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
+                placeholder="e.g., seller@example.com"
               />
             </div>
             <div>
@@ -56,22 +36,19 @@ export default function LoginScreen() {
               <input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
-            {error && (
-              <p className="text-red-500 text-sm text-center">{error}</p>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 transition-colors disabled:bg-gray-400"
-            >
-              {loading ? "Logging in..." : "Login"}
+            <button className="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 transition-colors disabled:bg-gray-400">
+              sign in
             </button>
+            {message && (
+              <p className="mt-4 p-4 bg-foreground/10 text-red-500 text-center rounded-md">
+                {message}
+              </p>
+            )}
           </form>
         </div>
       </div>
