@@ -80,7 +80,7 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const response = await fetch("/api/generate-pdf", {
+      const response = await fetch("/api/generate-image", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", `NCF_Ticket_${ticket.id}.pdf`);
+      link.setAttribute("download", `NCF_Ticket_${ticket.id}.png`);
       document.body.appendChild(link);
       link.click();
       link.parentNode?.removeChild(link);
