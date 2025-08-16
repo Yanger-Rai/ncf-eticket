@@ -1,9 +1,9 @@
-// src/components/TicketView.tsx
-"use client";
-import React, { useState } from "react";
+// src/app/ticket-template/page.tsx
+
+import React from "react";
 import Image from "next/image";
 import { Ticket, TicketType } from "@/types/types";
-import "./TicketView.style.css";
+import "./ticket-template.css"; // We will create this CSS file next
 
 // --- SVG Icons ---
 const LocationPinIcon = () => (
@@ -56,13 +56,18 @@ const TICKET_DETAILS: Record<
   Donor: { price: 2500, description: "Donor Ticket" },
 };
 
-interface TicketViewProps {
-  ticket: Ticket;
-  sellerName: string;
-}
+export default function TicketTemplatePage({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
+  // Data is passed via URL search parameters
+  const ticket: Ticket = JSON.parse(searchParams.ticket || "{}");
+  const sellerName = searchParams.sellerName || "";
 
-export default function TicketView({ ticket, sellerName }: TicketViewProps) {
-  const [isDownloading, setIsDownloading] = useState(false);
+  if (!ticket.id) {
+    return <div>Loading ticket...</div>;
+  }
 
   const purchaseDate = new Date(ticket.purchase_date);
   const formattedDate = purchaseDate.toLocaleDateString("en-GB", {
@@ -77,41 +82,9 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
   const ticketDetails =
     TICKET_DETAILS[ticket.ticket_type] || TICKET_DETAILS["Admit One"];
 
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
-      const response = await fetch("/api/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ticket, sellerName }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to generate PDF");
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `NCF_Ticket_${ticket.id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Error downloading PDF:", error);
-      alert("Could not download ticket. Please try again.");
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
   return (
-    <div className="bg-gray-100 p-4 flex flex-col items-center">
-      <div className="ticket-container bg-transparent w-full max-w-sm mx-auto rounded-2xl shadow-lg font-sans flex flex-col">
+    <div className="ticket-render-container">
+      <div className="ticket-container bg-white w-full max-w-sm mx-auto rounded-2xl shadow-lg font-sans flex flex-col">
         <div className="p-6 flex-grow ticket-top bg-white rounded-t-2xl">
           <div className="flex justify-between items-start">
             <div>
@@ -167,7 +140,7 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
             </div>
           </div>
         </div>
-        <div className="ticket-stub flex-shrink-0 relative bg-red-800 text-white p-5 rounded-b-2xl">
+        <div className="ticket-stub">
           <div
             className="absolute inset-0 bg-repeat bg-center opacity-10"
             style={{
@@ -190,15 +163,6 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
             </div>
           </div>
         </div>
-      </div>
-      <div className="text-center mt-6 w-full max-w-sm">
-        <button
-          onClick={handleDownload}
-          disabled={isDownloading}
-          className="w-full px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300"
-        >
-          {isDownloading ? "Downloading PDF..." : "Download as PDF"}
-        </button>
       </div>
     </div>
   );

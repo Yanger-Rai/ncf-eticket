@@ -1,0 +1,7 @@
+.ticket-stub {
+  mask: radial-gradient(12px at 12px 3px, transparent 98%, #000) -12px 0;
+}
+
+.ticket-top {
+  mask: radial-gradient(12px at 12px 359px, transparent 98%, #000) -12px 0;
+}

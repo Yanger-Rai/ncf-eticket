@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^138.0.2",
+    "@sparticuz/chromium-min": "^138.0.2",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.55.0",
+    "@types/html2canvas": "^0.5.35",
+    "html-to-image": "^1.11.13",
     "next": "15.4.6",
+    "puppeteer": "^24.16.2",
+    "puppeteer-core": "^24.16.2",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },

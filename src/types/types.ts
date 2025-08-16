@@ -1,3 +1,5 @@
+export type TicketType = "Admit One" | "Admit Two" | "Family" | "Donor";
+
 export interface User {
   id: string;
   username: string;
@@ -14,4 +16,6 @@ export interface Ticket {
   status: TicketStatus;
   generated_by_id: string;
   generated_by_name: string;
+  ticket_type: TicketType; // Added
+  price: number; // Added
 }
