@@ -103,7 +103,9 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Error downloading PNG:", error);
-      alert("Could not download ticket. Please try again.");
+      alert(
+        "Could not download ticket. Please take a screenshot of this ticket."
+      );
     } finally {
       setIsDownloading(false);
     }
