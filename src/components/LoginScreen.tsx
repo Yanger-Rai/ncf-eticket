@@ -1,6 +1,22 @@
-import { login } from "@/app/login/actions";
+"use client";
 
-export default async function LoginScreen({ message }: { message?: string }) {
+import { login } from "@/app/login/actions";
+import { useFormStatus } from "react-dom";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      className="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 transition-colors disabled:bg-gray-400"
+      disabled={pending}
+    >
+      {pending ? "Signing in..." : "sign in"}
+    </button>
+  );
+}
+
+export default function LoginScreen({ message }: { message?: string }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-sm">
@@ -41,9 +57,7 @@ export default async function LoginScreen({ message }: { message?: string }) {
                 required
               />
             </div>
-            <button className="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 transition-colors disabled:bg-gray-400 cursor-pointer">
-              sign in
-            </button>
+            <SubmitButton />
             {message && (
               <p className="mt-4 p-4 bg-foreground/10 text-red-500 text-center rounded-md">
                 {message}

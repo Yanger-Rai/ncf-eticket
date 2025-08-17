@@ -118,7 +118,11 @@ export default function SellerValidatorDashboard({
               />
             )}
             {activeTab === "validate" && (
-              <ValidatorDashboard user={user} tickets={tickets} />
+              <ValidatorDashboard
+                user={user}
+                tickets={tickets}
+                onUpdateTicketStatus={handleUpdateTicketStatus}
+              />
             )}
           </div>
         );

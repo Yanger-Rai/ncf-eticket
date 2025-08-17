@@ -206,7 +206,11 @@ export default function AdminDashboard({
         />
       )}
       {activeTab === "validate" && (
-        <ValidatorDashboard user={user} tickets={tickets} />
+        <ValidatorDashboard
+          user={user}
+          tickets={tickets}
+          onUpdateTicketStatus={handleUpdateTicketStatus}
+        />
       )}
       {activeTab === "createUser" && <CreateUserForm />}
       {showTicketModal && currentTicket && (
