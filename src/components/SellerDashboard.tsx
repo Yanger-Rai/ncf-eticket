@@ -3,8 +3,7 @@ import React, { useState, useMemo, useTransition } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 import StatusBadge from "./StatusBadge";
 import { User, Ticket, TicketType, TicketStatus } from "@/types/types";
-import { createTicket } from "@/app/actions";
-import { createClient } from "@/lib/supabase/client";
+import { createTicket, updateTicketStatus } from "@/app/actions";
 
 interface SellerDashboardProps {
   user: User;
@@ -28,7 +27,6 @@ export default function SellerDashboard({
   onTicketGenerated,
   onUpdateTicketStatus,
 }: SellerDashboardProps) {
-  const supabase = createClient();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<Ticket | null>(null);
@@ -60,15 +58,18 @@ export default function SellerDashboard({
 
   const handleInvalidate = async (ticketId: string) => {
     setInvalidatingTicketId(ticketId);
-    // This should also be a server action for consistency, but for now...
-    const { error } = await supabase
-      .from("tickets")
-      .update({ status: "INVALIDATED" })
-      .eq("id", ticketId);
 
-    if (!error) {
-      onUpdateTicketStatus(ticketId, "INVALIDATED");
+    // Optimistically update the UI
+    onUpdateTicketStatus(ticketId, "INVALIDATED");
+
+    const result = await updateTicketStatus(ticketId, "INVALIDATED");
+
+    if (result.error) {
+      // Revert the UI on error
+      onUpdateTicketStatus(ticketId, "VALID");
+      alert(`Error: ${result.error}`);
     }
+
     setShowConfirm(null);
     setInvalidatingTicketId(null);
   };

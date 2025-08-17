@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { Ticket, User, TicketStatus } from "@/types/types";
 import StatusBadge from "./StatusBadge";
+import { updateTicketStatus } from "@/app/actions";
 
 interface ValidatorDashboardProps {
   user: User;
@@ -43,13 +44,16 @@ export default function ValidatorDashboard({
 
   const handleRedeem = async (ticketId: string) => {
     setRedeemingTicketId(ticketId);
-    const { error } = await supabase
-      .from("tickets")
-      .update({ status: "REDEEMED" })
-      .eq("id", ticketId);
 
-    if (!error) {
-      onUpdateTicketStatus(ticketId, "REDEEMED");
+    // Optimistic UI update
+    onUpdateTicketStatus(ticketId, "REDEEMED");
+
+    const result = await updateTicketStatus(ticketId, "REDEEMED");
+
+    if (result.error) {
+      // Revert on error
+      onUpdateTicketStatus(ticketId, "VALID");
+      alert(`Error: ${result.error}`);
     }
 
     setShowConfirm(null);

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useTransition } from "react";
+import React, { useState, useEffect, useTransition, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import SellerDashboard from "@/components/SellerDashboard";
@@ -155,16 +155,16 @@ export default function AdminDashboard({
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
   const [activeTab, setActiveTab] = useState<AdminActiveTab>("validate");
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     const { data } = await supabase.from("users").select("*");
     setUsers(data || []);
-  };
+  }, [supabase]);
 
   useEffect(() => {
     if (activeTab === "createUser") {
       fetchUsers();
     }
-  }, [activeTab]);
+  }, [activeTab, fetchUsers]);
 
   useEffect(() => {
     const channel = supabase
