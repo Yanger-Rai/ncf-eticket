@@ -102,7 +102,7 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Error downloading PDF:", error);
+      console.error("Error downloading PNG:", error);
       alert("Could not download ticket. Please try again.");
     } finally {
       setIsDownloading(false);
@@ -197,7 +197,7 @@ export default function TicketView({ ticket, sellerName }: TicketViewProps) {
           disabled={isDownloading}
           className="w-full px-8 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300"
         >
-          {isDownloading ? "Downloading PDF..." : "Download as PDF"}
+          {isDownloading ? "Downloading Image..." : "Download Image"}
         </button>
       </div>
     </div>

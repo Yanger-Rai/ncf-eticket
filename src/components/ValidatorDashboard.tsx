@@ -1,27 +1,68 @@
 "use client";
-import React, { useState, useMemo } from "react";
-import { createClient } from "@/lib/supabase/client";
+import React, { useState, useMemo, useTransition } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { Ticket, User } from "@/types/types";
 import StatusBadge from "./StatusBadge";
+import { redeemTicket } from "@/app/actions";
 
 interface ValidatorDashboardProps {
   user: User;
   tickets: Ticket[];
 }
 
-interface TicketListProps {
+// --- TicketList Component (Moved outside) ---
+const TicketList = ({
+  ticketList,
+  onRedeem,
+}: {
   ticketList: Ticket[];
   onRedeem: (ticket: Ticket) => void;
-}
+}) => (
+  <div className="space-y-3">
+    {ticketList.map((ticket) => (
+      <div
+        key={ticket.id}
+        className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
+        <div className="flex-1">
+          <p className="font-extrabold text-xl text-gray-900">{ticket.id}</p>
+          <p className="text-gray-800 text-lg">
+            Purchaser:{" "}
+            <span className="font-semibold">{ticket.purchaser_name}</span>
+          </p>
+          <p className="text-gray-600">
+            Seller:{" "}
+            <span className="font-semibold">{ticket.generated_by_name}</span>
+          </p>
+          <p className="text-xs text-gray-500">
+            Purchased: {new Date(ticket.purchase_date).toLocaleString()}
+          </p>
+        </div>
+        <div className="flex flex-col items-stretch sm:items-end gap-3 w-full sm:w-auto">
+          <StatusBadge status={ticket.status} />
+          {ticket.status === "VALID" && (
+            <button
+              onClick={() => onRedeem(ticket)}
+              className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 shadow-lg cursor-pointer"
+            >
+              REDEEM
+            </button>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 export default function ValidatorDashboard({
   user,
   tickets,
 }: ValidatorDashboardProps) {
-  const supabase = createClient();
+  // Removed unused supabase client initialization
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showConfirm, setShowConfirm] = useState<Ticket | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   const filteredTickets = useMemo(() => {
     if (!searchTerm.trim()) return tickets.slice(0, 10);
@@ -34,12 +75,16 @@ export default function ValidatorDashboard({
     );
   }, [searchTerm, tickets]);
 
-  const handleRedeem = async (ticketId: string) => {
-    await supabase
-      .from("tickets")
-      .update({ status: "REDEEMED" })
-      .eq("id", ticketId);
-    setShowConfirm(null);
+  const handleRedeem = () => {
+    if (!showConfirm) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await redeemTicket(showConfirm.id);
+      if (result.error) {
+        setError(result.error);
+      }
+      setShowConfirm(null); // Close the dialog
+    });
   };
 
   const handleDownloadReport = () => {
@@ -74,43 +119,6 @@ export default function ValidatorDashboard({
     document.body.removeChild(link);
   };
 
-  const TicketList = ({ ticketList, onRedeem }: TicketListProps) => (
-    <div className="space-y-3">
-      {ticketList.map((ticket) => (
-        <div
-          key={ticket.id}
-          className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-        >
-          <div className="flex-1">
-            <p className="font-extrabold text-xl text-gray-900">{ticket.id}</p>
-            <p className="text-gray-800 text-lg">
-              Purchaser:{" "}
-              <span className="font-semibold">{ticket.purchaser_name}</span>
-            </p>
-            <p className="text-gray-600">
-              Seller:{" "}
-              <span className="font-semibold">{ticket.generated_by_name}</span>
-            </p>
-            <p className="text-xs text-gray-500">
-              Purchased: {new Date(ticket.purchase_date).toLocaleString()}
-            </p>
-          </div>
-          <div className="flex flex-col items-stretch sm:items-end gap-3 w-full sm:w-auto">
-            <StatusBadge status={ticket.status} />
-            {ticket.status === "VALID" && (
-              <button
-                onClick={() => onRedeem(ticket)}
-                className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 shadow-lg"
-              >
-                REDEEM
-              </button>
-            )}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-
   return (
     <div className="p-4 space-y-6">
       <div className="bg-white p-6 rounded-xl shadow-lg">
@@ -140,14 +148,16 @@ export default function ValidatorDashboard({
         <h3 className="text-xl font-bold text-gray-700 mb-3">
           {searchTerm ? "Search Results" : "Recent Tickets"}
         </h3>
+        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
         <TicketList ticketList={filteredTickets} onRedeem={setShowConfirm} />
       </div>
 
       {showConfirm && (
         <ConfirmationDialog
           message={`Confirm redemption for ticket ${showConfirm.id}?`}
-          onConfirm={() => handleRedeem(showConfirm.id)}
+          onConfirm={handleRedeem}
           onCancel={() => setShowConfirm(null)}
+          isConfirming={isPending}
         />
       )}
     </div>

@@ -26,7 +26,9 @@ export default function Dashboard({ user, initialTickets }: DashboardProps) {
       <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold text-gray-800">Naga Food Fest</h1>
+            <h1 className="text-xl font-bold text-gray-800">
+              Naga Christain Fellowship Hyd - Food Fest
+            </h1>
             <p className="text-sm text-gray-600">
               Welcome, <span className="font-semibold">{user.name}</span> (
               {user.role})
@@ -34,7 +36,7 @@ export default function Dashboard({ user, initialTickets }: DashboardProps) {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-red-600 font-semibold hover:text-red-800"
+            className="flex items-center gap-2 text-sm text-red-600 font-semibold hover:text-red-800 cursor-pointer"
           >
             Logout
           </button>

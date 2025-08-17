@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useTransition } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
 import StatusBadge from "./StatusBadge";
-import { User, Ticket, TicketType } from "@/types/types";
+import { User, Ticket, TicketType, TicketStatus } from "@/types/types";
 import { createTicket } from "@/app/actions";
 import { createClient } from "@/lib/supabase/client";
 
@@ -10,6 +10,7 @@ interface SellerDashboardProps {
   user: User;
   tickets: Ticket[];
   onTicketGenerated: (ticket: Ticket) => void;
+  onUpdateTicketStatus: (ticketId: string, status: TicketStatus) => void;
 }
 
 const TICKET_DETAILS: Record<TicketType, { price: number }> = {
@@ -25,11 +26,15 @@ export default function SellerDashboard({
   user,
   tickets,
   onTicketGenerated,
+  onUpdateTicketStatus,
 }: SellerDashboardProps) {
   const supabase = createClient();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showConfirm, setShowConfirm] = useState<Ticket | null>(null);
+  const [invalidatingTicketId, setInvalidatingTicketId] = useState<
+    string | null
+  >(null);
 
   const myTickets = useMemo(
     () => tickets.filter((t) => t.generated_by_id === user.id),
@@ -54,12 +59,18 @@ export default function SellerDashboard({
   };
 
   const handleInvalidate = async (ticketId: string) => {
+    setInvalidatingTicketId(ticketId);
     // This should also be a server action for consistency, but for now...
-    await supabase
+    const { error } = await supabase
       .from("tickets")
       .update({ status: "INVALIDATED" })
       .eq("id", ticketId);
+
+    if (!error) {
+      onUpdateTicketStatus(ticketId, "INVALIDATED");
+    }
     setShowConfirm(null);
+    setInvalidatingTicketId(null);
   };
 
   return (
@@ -115,7 +126,7 @@ export default function SellerDashboard({
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+            className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-300 cursor-pointer"
           >
             {isPending ? "Generating..." : "Generate & View Ticket"}
           </button>
@@ -146,9 +157,12 @@ export default function SellerDashboard({
                   {ticket.status === "VALID" && (
                     <button
                       onClick={() => setShowConfirm(ticket)}
-                      className="bg-red-500 text-white text-xs font-bold py-2 px-3 rounded-md hover:bg-red-600"
+                      disabled={invalidatingTicketId === ticket.id}
+                      className="bg-red-500 text-white text-xs font-bold py-2 px-3 rounded-md hover:bg-red-600 disabled:bg-red-300 cursor-pointer"
                     >
-                      INVALIDATE
+                      {invalidatingTicketId === ticket.id
+                        ? "Invalidating..."
+                        : "INVALIDATE"}
                     </button>
                   )}
                 </div>

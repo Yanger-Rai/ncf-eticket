@@ -41,7 +41,7 @@ export default async function LoginScreen({ message }: { message?: string }) {
                 required
               />
             </div>
-            <button className="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 transition-colors disabled:bg-gray-400">
+            <button className="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 transition-colors disabled:bg-gray-400 cursor-pointer">
               sign in
             </button>
             {message && (

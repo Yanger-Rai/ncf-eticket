@@ -153,3 +153,42 @@ export async function createUser(formData: FormData) {
   revalidatePath("/");
   return { error: null, message: `User ${name} created successfully.` };
 }
+
+export async function redeemTicket(ticketId: string) {
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+      },
+    }
+  );
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) return { error: "Not authenticated" };
+
+  const { data: user } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
+  if (user?.role !== "admin" && user?.role !== "validator") {
+    return { error: "Not authorized" };
+  }
+
+  const { error } = await supabase
+    .from("tickets")
+    .update({ status: "REDEEMED" })
+    .eq("id", ticketId);
+
+  if (error) {
+    return { error: `Database error: ${error.message}` };
+  }
+
+  revalidatePath("/"); // This tells Next.js to refresh the dashboard data
+  return { error: null };
+}

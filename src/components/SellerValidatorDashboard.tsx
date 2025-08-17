@@ -6,7 +6,7 @@ import SellerDashboard from "@/components/SellerDashboard";
 import ValidatorDashboard from "@/components/ValidatorDashboard";
 import TicketView from "@/components/TicketView";
 import Modal from "@/components/Modal";
-import { User, Ticket } from "@/types/types";
+import { User, Ticket, TicketStatus } from "@/types/types";
 
 type ActiveTab = "generate" | "validate";
 
@@ -87,6 +87,12 @@ export default function SellerValidatorDashboard({
     setCurrentTicket(null);
   };
 
+  const handleUpdateTicketStatus = (ticketId: string, status: TicketStatus) => {
+    setTickets((currentTickets) =>
+      currentTickets.map((t) => (t.id === ticketId ? { ...t, status } : t))
+    );
+  };
+
   const DashboardComponent = () => {
     if (!user) return null;
     switch (user.role) {
@@ -96,6 +102,7 @@ export default function SellerValidatorDashboard({
             user={user}
             tickets={tickets}
             onTicketGenerated={handleTicketGenerated}
+            onUpdateTicketStatus={handleUpdateTicketStatus}
           />
         );
       case "validator":
@@ -107,6 +114,7 @@ export default function SellerValidatorDashboard({
                 user={user}
                 tickets={tickets}
                 onTicketGenerated={handleTicketGenerated}
+                onUpdateTicketStatus={handleUpdateTicketStatus}
               />
             )}
             {activeTab === "validate" && (

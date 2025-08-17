@@ -6,7 +6,7 @@ import SellerDashboard from "@/components/SellerDashboard";
 import ValidatorDashboard from "@/components/ValidatorDashboard";
 import TicketView from "@/components/TicketView";
 import Modal from "@/components/Modal";
-import { User, Ticket } from "@/types/types";
+import { User, Ticket, TicketStatus } from "@/types/types";
 import { createUser } from "@/app/actions";
 
 type AdminActiveTab = "generate" | "validate" | "createUser";
@@ -188,6 +188,12 @@ export default function AdminDashboard({
     setCurrentTicket(null);
   };
 
+  const handleUpdateTicketStatus = (ticketId: string, status: TicketStatus) => {
+    setTickets((currentTickets) =>
+      currentTickets.map((t) => (t.id === ticketId ? { ...t, status } : t))
+    );
+  };
+
   return (
     <>
       <AdminTabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -196,6 +202,7 @@ export default function AdminDashboard({
           user={user}
           tickets={tickets}
           onTicketGenerated={handleTicketGenerated}
+          onUpdateTicketStatus={handleUpdateTicketStatus}
         />
       )}
       {activeTab === "validate" && (
