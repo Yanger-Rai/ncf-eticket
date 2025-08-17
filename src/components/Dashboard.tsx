@@ -22,22 +22,17 @@ export default function Dashboard({ user, initialTickets }: DashboardProps) {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <header className="bg-white shadow-sm sticky top-0 z-20">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+    <div className="bg-gray-100 min-h-screen">
+      <header className="ios-header sticky top-0 z-20">
+        <div className="max-w-4xl mx-auto px-4 py-2 flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold text-gray-800">
-              Naga Christain Fellowship Hyd - Food Fest
-            </h1>
-            <p className="text-sm text-gray-600">
+            <h1 className="ios-header-title">NCF E-Ticket</h1>
+            <p className="ios-header-subtitle">
               Welcome, <span className="font-semibold">{user.name}</span> (
               {user.role})
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm text-red-600 font-semibold hover:text-red-800 cursor-pointer"
-          >
+          <button onClick={handleLogout} className="ios-button-link">
             Logout
           </button>
         </div>
