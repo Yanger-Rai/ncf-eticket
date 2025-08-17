@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer";
 import puppeteerCore from "puppeteer-core";
-import chromium from "@sparticuz/chromium-min";
+import chromium from "@sparticuz/chromium";
 import { Ticket, TicketType } from "@/types/types";
 
 // --- TICKET DETAILS MAPPING ---
