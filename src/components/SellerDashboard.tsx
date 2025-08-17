@@ -155,6 +155,7 @@ export default function SellerDashboard({
           message={`Are you sure you want to invalidate ticket ${showConfirm.id}? This cannot be undone.`}
           onConfirm={() => handleInvalidate(showConfirm.id)}
           onCancel={() => setShowConfirm(null)}
+          isConfirming={invalidatingTicketId === showConfirm.id}
         />
       )}
     </div>
