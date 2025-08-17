@@ -7,7 +7,8 @@ interface StatusBadgeProps {
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-  const baseClasses = "px-3 py-1 text-sm font-bold rounded-full text-white";
+  const baseClasses =
+    "px-3 py-1 text-sm font-bold rounded-full text-white w-fit";
   const statusMap: Record<TicketStatus, string> = {
     VALID: `bg-green-500 ${baseClasses}`,
     INVALIDATED: `bg-red-500 ${baseClasses}`,

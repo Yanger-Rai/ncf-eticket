@@ -31,7 +31,7 @@ export default function ValidatorDashboard({
   );
 
   const filteredTickets = useMemo(() => {
-    if (!searchTerm.trim()) return tickets.slice(0, 10);
+    if (!searchTerm.trim()) return tickets;
     const lowerCaseSearch = searchTerm.toLowerCase();
     return tickets.filter(
       (t) =>
@@ -179,7 +179,9 @@ export default function ValidatorDashboard({
 
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <h3 className="text-xl font-bold text-gray-700 mb-3">
-          {searchTerm ? "Search Results" : "Recent Tickets"}
+          {searchTerm
+            ? `Search Results (${filteredTickets.length})`
+            : `Recent Tickets (${filteredTickets.length})`}
         </h3>
         <TicketList
           ticketList={filteredTickets}

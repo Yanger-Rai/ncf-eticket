@@ -52,7 +52,7 @@ const AdminTabNavigation = ({
   </div>
 );
 
-const CreateUserForm = () => {
+const CreateUserForm = ({ onUserCreated }: { onUserCreated: () => void }) => {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -66,7 +66,7 @@ const CreateUserForm = () => {
         setError(result.error);
       } else {
         setMessage(result.message || "Success!");
-        // Reset form manually if needed
+        onUserCreated(); // Callback to refresh the user list
         const form = document.getElementById(
           "createUserForm"
         ) as HTMLFormElement;
@@ -76,70 +76,69 @@ const CreateUserForm = () => {
   };
 
   return (
-    <div className="p-4">
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Create New User
-        </h2>
-        <form id="createUserForm" action={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Full Name
-            </label>
-            <input
-              name="name"
-              type="text"
-              required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              name="email"
-              type="email"
-              required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Temporary Password
-            </label>
-            <input
-              name="password"
-              type="password"
-              required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Role
-            </label>
-            <select
-              name="role"
-              required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"
-            >
-              <option value="seller">Seller</option>
-              <option value="validator">Validator</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300"
+    <div className="bg-white p-6 rounded-xl shadow-lg">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">Create New User</h2>
+      <form id="createUserForm" action={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Full Name
+          </label>
+          <input
+            name="name"
+            type="text"
+            placeholder="rehlo"
+            required
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Email (Need not be a valid email)
+          </label>
+          <input
+            name="email"
+            type="email"
+            placeholder="rehlo@ncf.com"
+            required
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <input
+            name="password"
+            type="password"
+            placeholder="*****"
+            required
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Role
+          </label>
+          <select
+            name="role"
+            required
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"
           >
-            {isPending ? "Creating..." : "Create User"}
-          </button>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {message && <p className="text-green-500 text-sm">{message}</p>}
-        </form>
-      </div>
+            <option value="seller">Seller</option>
+            <option value="validator">Validator</option>
+            {/* <option value="admin">Admin</option> */}
+          </select>
+        </div>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-300"
+        >
+          {isPending ? "Creating..." : "Create User"}
+        </button>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {message && <p className="text-green-500 text-sm">{message}</p>}
+      </form>
     </div>
   );
 };
@@ -156,9 +155,21 @@ export default function AdminDashboard({
   const supabase = createClient();
   const router = useRouter();
   const [tickets, setTickets] = useState<Ticket[]>(initialTickets);
+  const [users, setUsers] = useState<User[]>([]);
   const [showTicketModal, setShowTicketModal] = useState(false);
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
   const [activeTab, setActiveTab] = useState<AdminActiveTab>("validate");
+
+  const fetchUsers = async () => {
+    const { data } = await supabase.from("users").select("*");
+    setUsers(data || []);
+  };
+
+  useEffect(() => {
+    if (activeTab === "createUser") {
+      fetchUsers();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     const channel = supabase
@@ -212,7 +223,28 @@ export default function AdminDashboard({
           onUpdateTicketStatus={handleUpdateTicketStatus}
         />
       )}
-      {activeTab === "createUser" && <CreateUserForm />}
+      {activeTab === "createUser" && (
+        <div className="p-4 space-y-6">
+          <CreateUserForm onUserCreated={fetchUsers} />
+          <div className="bg-white p-6 rounded-xl shadow-lg">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              All Users ({users.length})
+            </h2>
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+              {users.map((u) => (
+                <div key={u.id} className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-bold text-lg text-gray-900">{u.name}</p>
+                  <p className="text-gray-700">{u.username}</p>
+                  <p className="text-sm text-gray-500 font-semibold capitalize">
+                    {u.role}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showTicketModal && currentTicket && (
         <Modal onClose={handleCloseTicketView}>
           <TicketView ticket={currentTicket} sellerName={user.name} />
