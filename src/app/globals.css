@@ -1,7 +1,8 @@
+@import "./ios-styles.css";
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f0f0f2; /* systemGray6 */
   --foreground: #171717;
 }
 

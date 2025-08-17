@@ -74,45 +74,27 @@ export default function SellerDashboard({
   };
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Generate New Ticket
-        </h2>
+    <div className="py-4 space-y-8">
+      <div className="table-view-container">
+        <h3 className="table-view-header">Generate New Ticket</h3>
         <form
           id="generateTicketForm"
           action={handleFormSubmit}
-          className="space-y-4"
+          className="form-group"
         >
-          <div>
-            <label
-              htmlFor="purchaserName"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Purchaser&apos;s Full Name
-            </label>
+          <div className="form-row">
+            <label htmlFor="purchaserName">Name</label>
             <input
               id="purchaserName"
               name="purchaserName"
               type="text"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-              placeholder="e.g., Aniket Sharma"
+              placeholder="Purchaser's Full Name"
             />
           </div>
-          <div>
-            <label
-              htmlFor="ticketType"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Ticket Type
-            </label>
-            <select
-              id="ticketType"
-              name="ticketType"
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white"
-            >
+          <div className="form-row">
+            <label htmlFor="ticketType">Type</label>
+            <select id="ticketType" name="ticketType" required>
               {TICKET_OPTIONS.map((type) => (
                 <option key={type} value={type}>
                   {type} - ₹{TICKET_DETAILS[type].price.toFixed(2)}
@@ -120,49 +102,41 @@ export default function SellerDashboard({
               ))}
             </select>
           </div>
-
-          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-300 cursor-pointer"
-          >
-            {isPending ? "Generating..." : "Generate & View Ticket"}
-          </button>
         </form>
+        {error && <p className="text-red-500 text-sm mt-2 px-4">{error}</p>}
+        <button
+          type="submit"
+          form="generateTicketForm"
+          disabled={isPending}
+          className="w-full mt-4 bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-300"
+        >
+          {isPending ? "Generating..." : "Generate & View Ticket"}
+        </button>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          My Generated Tickets
-        </h2>
-        <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+      <div className="table-view-container">
+        <h3 className="table-view-header">
+          My Generated Tickets ({myTickets.length})
+        </h3>
+        <div className="table-view max-h-96 overflow-y-auto">
           {myTickets.length > 0 ? (
             myTickets.map((ticket) => (
-              <div
-                key={ticket.id}
-                className="bg-gray-50 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
-              >
+              <div key={ticket.id} className="table-view-item">
                 <div className="flex-1">
                   <p className="font-bold text-lg text-gray-900">{ticket.id}</p>
                   <p className="text-gray-700">{ticket.purchaser_name}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(ticket.purchase_date).toLocaleString()} -{" "}
-                    <span className="font-semibold">{ticket.ticket_type}</span>
-                  </p>
                 </div>
-                <div className="flex items-center gap-4 w-full sm:w-auto">
+                <div className="flex items-center gap-4">
                   <StatusBadge status={ticket.status} />
                   {ticket.status === "VALID" && (
                     <button
                       onClick={() => setShowConfirm(ticket)}
                       disabled={invalidatingTicketId === ticket.id}
-                      className="bg-red-500 text-white text-xs font-bold py-2 px-3 rounded-md hover:bg-red-600 disabled:bg-red-300 cursor-pointer"
+                      className="text-red-600 font-semibold text-sm"
                     >
                       {invalidatingTicketId === ticket.id
-                        ? "Invalidating..."
-                        : "INVALIDATE"}
+                        ? "..."
+                        : "Invalidate"}
                     </button>
                   )}
                 </div>

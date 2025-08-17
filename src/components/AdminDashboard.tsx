@@ -18,40 +18,35 @@ const AdminTabNavigation = ({
   activeTab: AdminActiveTab;
   setActiveTab: (tab: AdminActiveTab) => void;
 }) => (
-  <div className="flex border-b border-gray-200 bg-white sticky top-[65px] z-10">
-    <button
-      onClick={() => setActiveTab("generate")}
-      className={`flex-1 py-3 text-center font-semibold ${
-        activeTab === "generate"
-          ? "border-b-2 border-blue-600 text-blue-600"
-          : "text-gray-500"
-      }`}
-    >
-      Generate
-    </button>
-    <button
-      onClick={() => setActiveTab("validate")}
-      className={`flex-1 py-3 text-center font-semibold ${
-        activeTab === "validate"
-          ? "border-b-2 border-blue-600 text-blue-600"
-          : "text-gray-500"
-      }`}
-    >
-      Validate
-    </button>
-    <button
-      onClick={() => setActiveTab("createUser")}
-      className={`flex-1 py-3 text-center font-semibold ${
-        activeTab === "createUser"
-          ? "border-b-2 border-blue-600 text-blue-600"
-          : "text-gray-500"
-      }`}
-    >
-      Create User
-    </button>
+  <div className="segmented-control-wrapper">
+    <div className="segmented-control">
+      <button
+        onClick={() => setActiveTab("generate")}
+        className={`segmented-control-button ${
+          activeTab === "generate" ? "active" : ""
+        }`}
+      >
+        Generate
+      </button>
+      <button
+        onClick={() => setActiveTab("validate")}
+        className={`segmented-control-button ${
+          activeTab === "validate" ? "active" : ""
+        }`}
+      >
+        Validate
+      </button>
+      <button
+        onClick={() => setActiveTab("createUser")}
+        className={`segmented-control-button ${
+          activeTab === "createUser" ? "active" : ""
+        }`}
+      >
+        Create User
+      </button>
+    </div>
   </div>
 );
-
 const CreateUserForm = ({ onUserCreated }: { onUserCreated: () => void }) => {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
@@ -227,9 +222,7 @@ export default function AdminDashboard({
         <div className="p-4 space-y-6">
           <CreateUserForm onUserCreated={fetchUsers} />
           <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              All Users ({users.length})
-            </h2>
+            <h2 className="ttable-view-header">All Users ({users.length})</h2>
             <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
               {users.map((u) => (
                 <div key={u.id} className="bg-gray-50 p-4 rounded-lg">

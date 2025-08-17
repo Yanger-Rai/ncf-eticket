@@ -17,27 +17,25 @@ const TabNavigation = ({
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
 }) => (
-  <div className="flex border-b border-gray-200 bg-white sticky top-[65px] z-10">
-    <button
-      onClick={() => setActiveTab("generate")}
-      className={`flex-1 py-3 text-center font-semibold ${
-        activeTab === "generate"
-          ? "border-b-2 border-blue-600 text-blue-600"
-          : "text-gray-500"
-      }`}
-    >
-      Generate
-    </button>
-    <button
-      onClick={() => setActiveTab("validate")}
-      className={`flex-1 py-3 text-center font-semibold ${
-        activeTab === "validate"
-          ? "border-b-2 border-blue-600 text-blue-600"
-          : "text-gray-500"
-      }`}
-    >
-      Validate
-    </button>
+  <div className="segmented-control-wrapper">
+    <div className="segmented-control">
+      <button
+        onClick={() => setActiveTab("generate")}
+        className={`segmented-control-button ${
+          activeTab === "generate" ? "active" : ""
+        }`}
+      >
+        Generate
+      </button>
+      <button
+        onClick={() => setActiveTab("validate")}
+        className={`segmented-control-button ${
+          activeTab === "validate" ? "active" : ""
+        }`}
+      >
+        Validate
+      </button>
+    </div>
   </div>
 );
 
@@ -93,8 +91,9 @@ export default function SellerValidatorDashboard({
     );
   };
 
-  const DashboardComponent = () => {
+  const renderDashboard = () => {
     if (!user) return null;
+
     switch (user.role) {
       case "seller":
         return (
@@ -107,7 +106,7 @@ export default function SellerValidatorDashboard({
         );
       case "validator":
         return (
-          <div>
+          <>
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
             {activeTab === "generate" && (
               <SellerDashboard
@@ -124,7 +123,7 @@ export default function SellerValidatorDashboard({
                 onUpdateTicketStatus={handleUpdateTicketStatus}
               />
             )}
-          </div>
+          </>
         );
       default:
         return null;
@@ -133,7 +132,7 @@ export default function SellerValidatorDashboard({
 
   return (
     <>
-      <DashboardComponent />
+      {renderDashboard()}
       {showTicketModal && currentTicket && (
         <Modal onClose={handleCloseTicketView}>
           <TicketView ticket={currentTicket} sellerName={user.name} />

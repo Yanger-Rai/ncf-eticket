@@ -114,35 +114,22 @@ export default function ValidatorDashboard({
     onRedeem,
     redeemingTicketId,
   }: TicketListProps) => (
-    <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+    <div className="table-view max-h-96 overflow-y-auto">
       {ticketList.map((ticket) => (
-        <div
-          key={ticket.id}
-          className="bg-gray-50 p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3"
-        >
-          <div className="flex-1">
+        <div key={ticket.id} className="table-view-item flex-wrap">
+          <div className="flex-1 min-w-[150px]">
             <p className="font-extrabold text-xl text-gray-900">{ticket.id}</p>
-            <p className="text-gray-800 text-lg">
-              Purchaser:{" "}
-              <span className="font-semibold">{ticket.purchaser_name}</span>
-            </p>
-            <p className="text-gray-600">
-              Seller:{" "}
-              <span className="font-semibold">{ticket.generated_by_name}</span>
-            </p>
-            <p className="text-xs text-gray-500">
-              Purchased: {new Date(ticket.purchase_date).toLocaleString()}
-            </p>
+            <p className="text-gray-800 text-lg">{ticket.purchaser_name}</p>
           </div>
-          <div className="flex flex-col items-stretch sm:items-end gap-3 w-full sm:w-auto">
+          <div className="flex items-center gap-3 mt-2 sm:mt-0">
             <StatusBadge status={ticket.status} />
             {ticket.status === "VALID" && (
               <button
                 onClick={() => onRedeem(ticket)}
                 disabled={redeemingTicketId === ticket.id}
-                className="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 shadow-lg disabled:bg-green-300"
+                className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-green-300 text-sm"
               >
-                {redeemingTicketId === ticket.id ? "Redeeming..." : "REDEEM"}
+                {redeemingTicketId === ticket.id ? "..." : "REDEEM"}
               </button>
             )}
           </div>
@@ -152,24 +139,37 @@ export default function ValidatorDashboard({
   );
 
   return (
-    <div className="p-4 space-y-6">
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Validate Tickets
-        </h2>
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg"
-          placeholder="Search by ID, Purchaser, or Seller..."
-        />
+    <div className="py-4 space-y-6">
+      <div className="px-4">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-2 border-none rounded-lg text-lg bg-gray-200 pl-10"
+            placeholder="Search..."
+          />
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
         {user.role === "admin" && (
           <div className="mt-4 text-center">
             <button
               onClick={handleDownloadReport}
               disabled={isDownloading}
-              className="inline-flex items-center gap-2 px-6 py-2 bg-gray-700 text-white font-bold rounded-lg shadow-md hover:bg-gray-800 disabled:bg-gray-400"
+              className="ios-button-link text-base"
             >
               {isDownloading ? "Downloading..." : "Download Full Report"}
             </button>
@@ -177,8 +177,8 @@ export default function ValidatorDashboard({
         )}
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-lg">
-        <h3 className="text-xl font-bold text-gray-700 mb-3">
+      <div className="table-view-container">
+        <h3 className="table-view-header">
           {searchTerm
             ? `Search Results (${filteredTickets.length})`
             : `Recent Tickets (${filteredTickets.length})`}
