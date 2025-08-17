@@ -116,23 +116,34 @@ export default function ValidatorDashboard({
   }: TicketListProps) => (
     <div className="table-view max-h-96 overflow-y-auto">
       {ticketList.map((ticket) => (
-        <div key={ticket.id} className="table-view-item flex-wrap">
-          <div className="flex-1 min-w-[150px]">
-            <p className="font-extrabold text-xl text-gray-900">{ticket.id}</p>
-            <p className="text-gray-800 text-lg">{ticket.purchaser_name}</p>
-          </div>
-          <div className="flex items-center gap-3 mt-2 sm:mt-0">
+        <div
+          key={ticket.id}
+          className="table-view-item flex flex-col items-start gap-4"
+        >
+          <div className="w-full flex justify-between items-start">
+            <div className="flex-1">
+              <p className="font-extrabold text-xl text-gray-900">
+                {ticket.id}
+              </p>
+              <p className="text-gray-800 text-lg">
+                Purchaser:{" "}
+                <span className="font-semibold">{ticket.purchaser_name}</span>
+              </p>
+              <p className="text-xs text-gray-500">
+                Purchased: {new Date(ticket.purchase_date).toLocaleString()}
+              </p>
+            </div>
             <StatusBadge status={ticket.status} />
-            {ticket.status === "VALID" && (
-              <button
-                onClick={() => onRedeem(ticket)}
-                disabled={redeemingTicketId === ticket.id}
-                className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 disabled:bg-green-300 text-sm"
-              >
-                {redeemingTicketId === ticket.id ? "..." : "REDEEM"}
-              </button>
-            )}
           </div>
+          {ticket.status === "VALID" && (
+            <button
+              onClick={() => onRedeem(ticket)}
+              disabled={redeemingTicketId === ticket.id}
+              className="ios-button-primary"
+            >
+              {redeemingTicketId === ticket.id ? "Redeeming..." : "REDEEM"}
+            </button>
+          )}
         </div>
       ))}
     </div>

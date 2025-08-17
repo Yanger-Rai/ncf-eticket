@@ -2,6 +2,7 @@
 
 import { login } from "@/app/login/actions";
 import { useFormStatus } from "react-dom";
+import Image from "next/image";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -16,13 +17,21 @@ function SubmitButton() {
   );
 }
 
+const logoUrl =
+  "https://dknmnivlsnzkwhhrrlyz.supabase.co/storage/v1/object/public/ticket-assets/NCF_Logo_BlackTag.png";
+
 export default function LoginScreen({ message }: { message?: string }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Naga Food Fest</h1>
-          <p className="text-gray-600">Ticket Management Portal</p>
+        <div className="flex flex-col items-center justify-center py-6">
+          <div className="w-20 h-12">
+            <Image src={logoUrl} alt="Naga Thali" width={80} height={40} />
+          </div>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-800">Naga Food Fest</h1>
+            <p className="text-gray-600">Ticket Management Portal</p>
+          </div>
         </div>
         <div className="bg-white p-8 rounded-2xl shadow-xl">
           <form className="space-y-6" action={login}>
